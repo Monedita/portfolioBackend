@@ -17,7 +17,8 @@
     "@faker-js/faker": "^10.2.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
-    "joi": "^18.0.2"
+    "joi": "^18.0.2",
+    "mongodb": "~7.0.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
