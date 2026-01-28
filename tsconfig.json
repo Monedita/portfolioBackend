@@ -8,7 +8,7 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "allowImplicitAny": false,
+        "noImplicitAny": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,
         "outDir": "./dist",
