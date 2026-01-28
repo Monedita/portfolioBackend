@@ -14,6 +14,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.28.1",
   "dependencies": {
+    "@faker-js/faker": "^10.2.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "joi": "^18.0.2"
