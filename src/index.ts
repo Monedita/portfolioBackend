@@ -4,6 +4,7 @@ import express from "express";
 import cors from "cors";
 
 import router from './routes/index';
+import errorHandler from "./middlewares/errorHandler.middleware";
 
 const app: Express = express();
 const port: number = process.env.PORT ? parseInt(process.env.PORT) : 3000;
@@ -24,6 +25,9 @@ app.get("/", (req: Request, res: Response): void => {
   res.send("Server working!");
 });
 app.use('/api', router);
+
+// Error handling middleware
+app.use(errorHandler);
 
 // Start server
 app.listen(port, (): void => {
