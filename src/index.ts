@@ -3,6 +3,8 @@ import type { Express } from "express";
 import express from "express";
 import cors from "cors";
 
+import router from './routes/index';
+
 const app: Express = express();
 const port: number = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
@@ -21,6 +23,7 @@ app.use(express.json());
 app.get("/", (req: Request, res: Response): void => {
   res.send("Server working!");
 });
+app.use('/api', router);
 
 // Start server
 app.listen(port, (): void => {
