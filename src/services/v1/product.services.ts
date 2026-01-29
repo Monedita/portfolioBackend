@@ -1,11 +1,12 @@
 import { faker } from '@faker-js/faker';
-import Product from "../../models/v1/product.models";
+import type { Product } from "../../models/v1/product.models";
 import type { ObjectId } from "mongodb";
+import { mongoService } from "./mongodb.services";
 
 
 class ProductServicesV1 {
     private productsList: Product[];
-    
+
     constructor() {
         this.productsList = [];
         for (let i = 0; i < 10; i++) {
@@ -19,21 +20,27 @@ class ProductServicesV1 {
         }
     }
 
-    public getAllProducts(): Product[] {
-        return this.productsList;
+    public async getAllProducts(): Promise<Product[]> {
+        return await mongoService.find<Product>('products');
     }
 
     public getOneProduct(_id: ObjectId): Product | undefined {
-        return this.productsList.find(product => product._id === _id);
+        return {
+            name: faker.commerce.productName(),
+            price: parseFloat(faker.commerce.price()),
+            description: faker.commerce.productDescription(),
+            stock: faker.number.int({ min: 0, max: 100 }),
+            createAt: faker.date.past()
+        };
     }
 
-    public createProduct(productData: Omit<Product, 'createAt'>): Product {
+    public async createProduct(productData: Omit<Product, 'createAt'>): Promise<Product> {
         const newProduct: Product = {
             createAt: new Date(),
             ...productData
         };
-        this.productsList.push(newProduct);
-        return newProduct;
+        const createdId: Product = await mongoService.insertOne<Product>('products', newProduct) as Product;
+        return createdId;
     }
 
     public updateProduct(_id: ObjectId, updateData: Partial<Omit<Product, 'createAt'>>): Product | undefined {

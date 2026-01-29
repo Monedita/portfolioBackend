@@ -25,9 +25,14 @@ class MongoService {
         return db.collection<T>(name);
     }
 
-    async insertOne<T extends Document>(collectionName: string, doc: OptionalUnlessRequiredId<T>) {
+    async insertOne<T extends Document>(collectionName: string, doc: OptionalUnlessRequiredId<T>): Promise<Document> {
         const col = await this.getCollection<T>(collectionName);
-        return col.insertOne(doc);
+        const result = await col.insertOne(doc);
+        if (!result.acknowledged) {
+            throw new Error("Insert operation was not acknowledged");
+        } else {
+         return result.insertedId;
+        }
     }
 
     async find<T extends Document>(collectionName: string, query = {}) {

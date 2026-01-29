@@ -1,4 +1,4 @@
-import type Product from "../models/v1/product.models";
+import type { Product } from "../models/v1/product.models";
 import { faker } from '@faker-js/faker';
 import { mongoService } from "../services/v1/mongodb.services";
 
