@@ -2,22 +2,21 @@ import type Product from "../models/v1/product.models";
 import { faker } from '@faker-js/faker';
 import { mongoService } from "../services/v1/mongodb.services";
 
-export default async function seed() {
+async function seed() {
     const productsAmount: number = await mongoService.countDocuments<Product>("products");
     console.log(`Amount of products already in the database: ${productsAmount}`);
     if (productsAmount < 100) {
         let amountAdded = 0;
         for (let i = productsAmount; i < 100; i++) {
             try {
-                const product: Omit<Product, 'id'> = {
-                    // id: faker.string.uuid(),
+                const product: Product = {
                     name: faker.commerce.productName(),
-                    price: parseFloat(faker.commerce.price()),
+                    price: faker.number.int({ min: 100, max: 10000 }), // Price in cents
                     description: faker.commerce.productDescription(),
                     stock: faker.number.int({ min: 0, max: 100 }),
                     createAt: faker.date.past()
                 };
-                await mongoService.insertOne<Omit<Product, 'id'>>("products", product);
+                await mongoService.insertOne<Product>("products", product);
                 console.log(`Product inserted: ${product.name}`);
                 amountAdded++;
             } catch (error) {

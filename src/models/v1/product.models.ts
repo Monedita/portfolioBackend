@@ -1,5 +1,7 @@
+import type { ObjectId } from "mongodb";
+
 export default interface Product {
-    id: string;
+    _id?: ObjectId;
     name: string;
     price: number;
     description?: string;

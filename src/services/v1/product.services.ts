@@ -1,5 +1,7 @@
 import { faker } from '@faker-js/faker';
 import Product from "../../models/v1/product.models";
+import type { ObjectId } from "mongodb";
+
 
 class ProductServicesV1 {
     private productsList: Product[];
@@ -8,7 +10,6 @@ class ProductServicesV1 {
         this.productsList = [];
         for (let i = 0; i < 10; i++) {
             this.productsList.push({
-                id: faker.string.uuid(),
                 name: faker.commerce.productName(),
                 price: parseFloat(faker.commerce.price()),
                 description: faker.commerce.productDescription(),
@@ -22,13 +23,12 @@ class ProductServicesV1 {
         return this.productsList;
     }
 
-    public getOneProduct(id: string): Product | undefined {
-        return this.productsList.find(product => product.id === id);
+    public getOneProduct(_id: ObjectId): Product | undefined {
+        return this.productsList.find(product => product._id === _id);
     }
 
-    public createProduct(productData: Omit<Product, 'id' | 'createAt'>): Product {
+    public createProduct(productData: Omit<Product, 'createAt'>): Product {
         const newProduct: Product = {
-            id: faker.string.uuid(),
             createAt: new Date(),
             ...productData
         };
@@ -36,8 +36,8 @@ class ProductServicesV1 {
         return newProduct;
     }
 
-    public updateProduct(id: string, updateData: Partial<Omit<Product, 'id' | 'createAt'>>): Product | undefined {
-        const productIndex = this.productsList.findIndex(product => product.id === id);
+    public updateProduct(_id: ObjectId, updateData: Partial<Omit<Product, 'createAt'>>): Product | undefined {
+        const productIndex = this.productsList.findIndex(product => product._id === _id);
         if (productIndex === -1) return undefined;
         const updatedProduct = {
             ...this.productsList[productIndex],
@@ -47,8 +47,8 @@ class ProductServicesV1 {
         return updatedProduct;
     }
 
-    public deleteProduct(id: string): boolean {
-        const productIndex = this.productsList.findIndex(product => product.id === id);
+    public deleteProduct(_id: ObjectId): boolean {
+        const productIndex = this.productsList.findIndex(product => product._id === _id);
         if (productIndex === -1) return false;
         this.productsList.splice(productIndex, 1);
         return true;
