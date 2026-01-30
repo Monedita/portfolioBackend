@@ -6,7 +6,18 @@ import productServicesV1 from '../../services/v1/product.services';
 
 const router = express.Router();
 
-// Product Routes
+
+/**
+ * @openapi
+ * /api/v1/products:
+ *   get:
+ *     summary: Get all products
+ *     tags:
+ *       - Products
+ *     responses:
+ *       200:
+ *         description: List of products
+ */
 router.get('/',
   async (req: Request, res: Response) => {
     const products = await productServicesV1.getAllProducts();
@@ -14,6 +25,24 @@ router.get('/',
   }
 );
 
+
+/**
+ * @openapi
+ * /api/v1/products:
+ *   post:
+ *     summary: Create a new product
+ *     tags:
+ *       - Products
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Product'
+ *     responses:
+ *       201:
+ *         description: Product created
+ */
 router.post('/',
   schemaValidator(createProductSchema, 'body'),
   async (req: Request, res: Response) => {
@@ -22,6 +51,27 @@ router.post('/',
   }
 );
 
+
+/**
+ * @openapi
+ * /api/v1/products/{_id}:
+ *   get:
+ *     summary: Get a product by ID
+ *     tags:
+ *       - Products
+ *     parameters:
+ *       - in: path
+ *         name: _id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Product ID
+ *     responses:
+ *       200:
+ *         description: Product found
+ *       404:
+ *         description: Product not found
+ */
 router.get('/:_id',
   schemaValidator(mongoDbIdSchema, 'params'),
   async (req: Request, res: Response) => {
@@ -36,6 +86,33 @@ router.get('/:_id',
   }
 );
 
+
+/**
+ * @openapi
+ * /api/v1/products/{_id}:
+ *   put:
+ *     summary: Replace a product by ID
+ *     tags:
+ *       - Products
+ *     parameters:
+ *       - in: path
+ *         name: _id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Product ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Product'
+ *     responses:
+ *       200:
+ *         description: Product replaced
+ *       404:
+ *         description: Product not found
+ */
 router.put('/:_id',
   schemaValidator(mongoDbIdSchema, 'params'),
   schemaValidator(createProductSchema, 'body'),
@@ -51,6 +128,33 @@ router.put('/:_id',
   }
 );
 
+
+/**
+ * @openapi
+ * /api/v1/products/{_id}:
+ *   patch:
+ *     summary: Partially update a product by ID
+ *     tags:
+ *       - Products
+ *     parameters:
+ *       - in: path
+ *         name: _id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Product ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Product'
+ *     responses:
+ *       200:
+ *         description: Product updated
+ *       404:
+ *         description: Product not found
+ */
 router.patch('/:_id',
   schemaValidator(mongoDbIdSchema, 'params'),
   schemaValidator(updateProductSchema, 'body'),
@@ -66,6 +170,27 @@ router.patch('/:_id',
   }
 );
 
+
+/**
+ * @openapi
+ * /api/v1/products/{_id}:
+ *   delete:
+ *     summary: Delete a product by ID
+ *     tags:
+ *       - Products
+ *     parameters:
+ *       - in: path
+ *         name: _id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Product ID
+ *     responses:
+ *       204:
+ *         description: Product successfully deleted
+ *       404:
+ *         description: Product not found
+ */
 router.delete('/:_id', schemaValidator(mongoDbIdSchema, 'params'), async (req: Request, res: Response) => {
   if (typeof req.params._id !== 'string') {
     return res.status(400).json({ error: 'Invalid _id parameter' });

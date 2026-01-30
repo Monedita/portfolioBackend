@@ -1,5 +1,32 @@
+
 import Joi from "joi";
 import type { ObjectId } from "mongodb";
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     Product:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: Nombre del producto
+ *         price:
+ *           type: number
+ *           description: Precio del producto
+ *         description:
+ *           type: string
+ *           description: Descripción del producto
+ *         stock:
+ *           type: number
+ *           description: Stock disponible
+ *       required:
+ *         - name
+ *         - price
+ *         - description
+ *         - stock
+ */
 
 export interface Product {
     _id?: ObjectId;
