@@ -38,18 +38,31 @@ router.get('/:_id',
 
 router.put('/:_id',
   schemaValidator(mongoDbIdSchema, 'params'),
+  schemaValidator(createProductSchema, 'body'),
+  async (req: Request, res: Response) => {
+    if (typeof req.params._id !== 'string') {
+      return res.status(400).json({ error: 'Invalid _id parameter' });
+    }
+    const document = await productServicesV1.replaceProduct(req.params._id, req.body);
+    if (!document) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    return res.status(200).json(document);
+  }
+);
+
+router.patch('/:_id',
+  schemaValidator(mongoDbIdSchema, 'params'),
   schemaValidator(updateProductSchema, 'body'),
   async (req: Request, res: Response) => {
     if (typeof req.params._id !== 'string') {
       return res.status(400).json({ error: 'Invalid _id parameter' });
     }
-    const result = await productServicesV1.updateProduct(req.params._id, req.body);
-    if (!result.acknowledged) {
-      return res.status(500).json({ error: 'Failed to update product' });
-    } else if (result.modifiedCount === 0) {
+    const document = await productServicesV1.updateProduct(req.params._id, req.body);
+    if (!document) {
       return res.status(404).json({ error: 'Product not found' });
     }
-    return res.status(204).json({ message: 'Product updated successfully' });
+    return res.status(200).json(document);
   }
 );
 

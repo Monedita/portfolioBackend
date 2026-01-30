@@ -25,9 +25,18 @@ class ProductServicesV1 {
         return createdId;
     }
 
-    public async updateProduct(_id: string, updateData: Partial<Omit<Product, 'createAt'>>): Promise<UpdateResult> {
+    public async replaceProduct(_id: string, productData: Omit<Product, 'createAt'>): Promise<Product | null> {
         const objectId = new ObjectId(_id);
-        return await mongoService.updateOne<Product>('products', { _id: objectId }, updateData);
+        const newProduct: Product = {
+            createAt: new Date(),
+            ...productData
+        };
+        return await mongoService.findOneAndReplace<Product>('products', { _id: objectId }, newProduct);
+    }
+
+    public async updateProduct(_id: string, updateData: Partial<Omit<Product, 'createAt'>>): Promise<Product | null> {
+        const objectId = new ObjectId(_id);
+        return await mongoService.findOneAndUpdate<Product>('products', { _id: objectId }, updateData);
     }
 
     public async deleteProduct(_id: string): Promise<DeleteResult> {

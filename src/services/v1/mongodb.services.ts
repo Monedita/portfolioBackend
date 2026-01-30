@@ -45,9 +45,14 @@ class MongoService {
         return col.findOne(query);
     }
 
-    async updateOne<T extends Document>(collectionName: string, query = {}, updateData: Partial<T>): Promise<UpdateResult> {
+    async findOneAndReplace<T extends Document>(collectionName: string, query = {}, replacement: T): Promise<WithId<T> | null> {
         const col = await this.getCollection<T>(collectionName);
-        return await col.updateOne(query, { $set: updateData });
+        return await col.findOneAndReplace(query, replacement, { returnDocument: 'after' });
+    }
+
+    async findOneAndUpdate<T extends Document>(collectionName: string, query = {}, updateData: Partial<T>): Promise<WithId<T> | null> {
+        const col = await this.getCollection<T>(collectionName);
+        return await col.findOneAndUpdate(query, { $set: updateData }, { returnDocument: 'after' });
     }
 
     async deleteOne<T extends Document>(collectionName: string, query = {}) {
