@@ -1,4 +1,4 @@
-import type { Document, OptionalUnlessRequiredId, WithId } from "mongodb";
+import type { Document, OptionalUnlessRequiredId, UpdateResult, WithId } from "mongodb";
 import { MongoClient, Db, Collection } from "mongodb";
 
 class MongoService {
@@ -43,6 +43,11 @@ class MongoService {
     async findOne<T extends Document>(collectionName: string, query = {}): Promise<WithId<T> | null> {
         const col = await this.getCollection<T>(collectionName);
         return col.findOne(query);
+    }
+
+    async updateOne<T extends Document>(collectionName: string, query = {}, updateData: Partial<T>): Promise<UpdateResult> {
+        const col = await this.getCollection<T>(collectionName);
+        return await col.updateOne(query, { $set: updateData });
     }
 
     async deleteOne<T extends Document>(collectionName: string, query = {}) {

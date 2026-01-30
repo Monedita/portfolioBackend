@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { createProductSchema, mongoDbIdSchema } from '../../models/v1/product.models';
+import { createProductSchema, updateProductSchema, mongoDbIdSchema } from '../../models/v1/product.models';
 import express from 'express';
 import schemaValidator from '../../middlewares/schemaValidator.middleware';
 import productServicesV1 from '../../services/v1/product.services';
@@ -7,26 +7,51 @@ import productServicesV1 from '../../services/v1/product.services';
 const router = express.Router();
 
 // Product Routes
-router.get('/', async (req: Request, res: Response) => {
-  const products = await productServicesV1.getAllProducts();
-  return res.json(products);
-});
-
-router.get('/:_id', schemaValidator(mongoDbIdSchema, 'params'), async (req: Request, res: Response) => {
-  if (typeof req.params._id !== 'string') {
-    return res.status(400).json({ error: 'Invalid _id parameter' });
+router.get('/',
+  async (req: Request, res: Response) => {
+    const products = await productServicesV1.getAllProducts();
+    return res.json(products);
   }
-  const product = await productServicesV1.getOneProduct(req.params._id);
-  if (!product) {
-    return res.status(404).json({ error: 'Product not found' });
-  }
-  return res.json(product);
-});
+);
 
-router.post('/', schemaValidator(createProductSchema, 'body'), async (req: Request, res: Response) => {
-  const createdId = await productServicesV1.createProduct(req.body);
-  return res.json(createdId);
-});
+router.post('/',
+  schemaValidator(createProductSchema, 'body'),
+  async (req: Request, res: Response) => {
+    const createdId = await productServicesV1.createProduct(req.body);
+    return res.status(201).json(createdId);
+  }
+);
+
+router.get('/:_id',
+  schemaValidator(mongoDbIdSchema, 'params'),
+  async (req: Request, res: Response) => {
+    if (typeof req.params._id !== 'string') {
+      return res.status(400).json({ error: 'Invalid _id parameter' });
+    }
+    const product = await productServicesV1.getOneProduct(req.params._id);
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    return res.status(200).json(product);
+  }
+);
+
+router.put('/:_id',
+  schemaValidator(mongoDbIdSchema, 'params'),
+  schemaValidator(updateProductSchema, 'body'),
+  async (req: Request, res: Response) => {
+    if (typeof req.params._id !== 'string') {
+      return res.status(400).json({ error: 'Invalid _id parameter' });
+    }
+    const result = await productServicesV1.updateProduct(req.params._id, req.body);
+    if (!result.acknowledged) {
+      return res.status(500).json({ error: 'Failed to update product' });
+    } else if (result.modifiedCount === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    return res.status(204).json({ message: 'Product updated successfully' });
+  }
+);
 
 router.delete('/:_id', schemaValidator(mongoDbIdSchema, 'params'), async (req: Request, res: Response) => {
   if (typeof req.params._id !== 'string') {

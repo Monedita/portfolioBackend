@@ -1,5 +1,5 @@
 import type { Product } from "../../models/v1/product.models";
-import type { WithId, DeleteResult } from "mongodb";
+import type { WithId, DeleteResult, UpdateResult } from "mongodb";
 import { ObjectId } from "mongodb";
 
 // Database service
@@ -25,9 +25,10 @@ class ProductServicesV1 {
         return createdId;
     }
 
-    // public updateProduct(_id: string, updateData: Partial<Omit<Product, 'createAt'>>): Product | undefined {
-    //     return true;
-    // }
+    public async updateProduct(_id: string, updateData: Partial<Omit<Product, 'createAt'>>): Promise<UpdateResult> {
+        const objectId = new ObjectId(_id);
+        return await mongoService.updateOne<Product>('products', { _id: objectId }, updateData);
+    }
 
     public async deleteProduct(_id: string): Promise<DeleteResult> {
         const objectId = new ObjectId(_id);

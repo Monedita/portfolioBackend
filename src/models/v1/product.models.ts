@@ -21,13 +21,10 @@ export const mongoDbIdSchema = Joi.object({
     _id: Joi.string().hex().length(24).required(), // if you want to validate ObjectId as string
 });
 
-/*
 export const updateProductSchema = Joi.object({
-    _id: Joi.string().hex().length(24).required(), // if you want to validate ObjectId as string
     name: Joi.string().optional(),
     price: Joi.number().min(100).optional(),
     description: Joi.string().optional(),
     stock: Joi.number().min(0).optional(),
     createAt: Joi.date().optional(),
-});
-*/
+}).min(1);
