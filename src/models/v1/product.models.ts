@@ -17,6 +17,10 @@ export const createProductSchema = Joi.object({
     stock: Joi.number().min(0).required(),
 });
 
+export const getOneProductSchema = Joi.object({
+    _id: Joi.string().hex().length(24).required(), // if you want to validate ObjectId as string
+});
+
 /*
 export const updateProductSchema = Joi.object({
     _id: Joi.string().hex().length(24).required(), // if you want to validate ObjectId as string

@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import type { Product } from "../../models/v1/product.models";
-import type { ObjectId } from "mongodb";
+import type { ObjectId, WithId } from "mongodb";
+
 import { mongoService } from "./mongodb.services";
 
 
@@ -24,14 +25,8 @@ class ProductServicesV1 {
         return await mongoService.find<Product>('products');
     }
 
-    public getOneProduct(_id: ObjectId): Product | undefined {
-        return {
-            name: faker.commerce.productName(),
-            price: parseFloat(faker.commerce.price()),
-            description: faker.commerce.productDescription(),
-            stock: faker.number.int({ min: 0, max: 100 }),
-            createAt: faker.date.past()
-        };
+    public async getOneProduct(_id: ObjectId): Promise<WithId<Product> | null> {
+        return await mongoService.findOne<Product>('products', _id);
     }
 
     public async createProduct(productData: Omit<Product, 'createAt'>): Promise<Product> {

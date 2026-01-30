@@ -1,4 +1,4 @@
-import type { Document, OptionalUnlessRequiredId } from "mongodb";
+import type { Document, OptionalUnlessRequiredId, WithId } from "mongodb";
 import { MongoClient, Db, Collection } from "mongodb";
 
 class MongoService {
@@ -38,6 +38,11 @@ class MongoService {
     async find<T extends Document>(collectionName: string, query = {}) {
         const col = await this.getCollection<T>(collectionName);
         return col.find(query).toArray();
+    }
+
+    async findOne<T extends Document>(collectionName: string, query = {}): Promise<WithId<T> | null> {
+        const col = await this.getCollection<T>(collectionName);
+        return col.findOne(query);
     }
 
     async countDocuments<T extends Document>(collectionName: string, query = {}) {
