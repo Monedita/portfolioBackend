@@ -45,6 +45,12 @@ class MongoService {
         return col.findOne(query);
     }
 
+    async deleteOne<T extends Document>(collectionName: string, query = {}) {
+        const col = await this.getCollection<T>(collectionName);
+        const result = await col.deleteOne(query);
+        return result;
+    }
+
     async countDocuments<T extends Document>(collectionName: string, query = {}) {
         const col = await this.getCollection<T>(collectionName);
         return col.countDocuments(query);

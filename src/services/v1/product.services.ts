@@ -1,32 +1,19 @@
-import { faker } from '@faker-js/faker';
 import type { Product } from "../../models/v1/product.models";
-import type { ObjectId, WithId } from "mongodb";
+import type { WithId, DeleteResult } from "mongodb";
+import { ObjectId } from "mongodb";
 
+// Database service
 import { mongoService } from "./mongodb.services";
 
-
 class ProductServicesV1 {
-    private productsList: Product[];
-
-    constructor() {
-        this.productsList = [];
-        for (let i = 0; i < 10; i++) {
-            this.productsList.push({
-                name: faker.commerce.productName(),
-                price: parseFloat(faker.commerce.price()),
-                description: faker.commerce.productDescription(),
-                stock: faker.number.int({ min: 0, max: 100 }),
-                createAt: faker.date.past()
-            });
-        }
-    }
 
     public async getAllProducts(): Promise<Product[]> {
         return await mongoService.find<Product>('products');
     }
 
-    public async getOneProduct(_id: ObjectId): Promise<WithId<Product> | null> {
-        return await mongoService.findOne<Product>('products', _id);
+    public async getOneProduct(_id: string): Promise<WithId<Product> | null> {
+        const objectId = new ObjectId(_id);
+        return await mongoService.findOne<Product>('products', { _id: objectId });
     }
 
     public async createProduct(productData: Omit<Product, 'createAt'>): Promise<Product> {
@@ -38,22 +25,13 @@ class ProductServicesV1 {
         return createdId;
     }
 
-    public updateProduct(_id: ObjectId, updateData: Partial<Omit<Product, 'createAt'>>): Product | undefined {
-        const productIndex = this.productsList.findIndex(product => product._id === _id);
-        if (productIndex === -1) return undefined;
-        const updatedProduct = {
-            ...this.productsList[productIndex],
-            ...updateData
-        };
-        this.productsList[productIndex] = updatedProduct;
-        return updatedProduct;
-    }
+    // public updateProduct(_id: string, updateData: Partial<Omit<Product, 'createAt'>>): Product | undefined {
+    //     return true;
+    // }
 
-    public deleteProduct(_id: ObjectId): boolean {
-        const productIndex = this.productsList.findIndex(product => product._id === _id);
-        if (productIndex === -1) return false;
-        this.productsList.splice(productIndex, 1);
-        return true;
+    public async deleteProduct(_id: string): Promise<DeleteResult> {
+        const objectId = new ObjectId(_id);
+        return await mongoService.deleteOne<Product>('products', { _id: objectId });
     }
 }
 
