@@ -29,3 +29,22 @@ services:
       - ./tsconfig.json:/app/tsconfig.json
     command: sh -c "npm install typescript ts-node @faker-js/faker mongodb && npx ts-node src/scripts/seed.ts"
     restart: 'no'
+
+  dev:
+    image: node:20-slim
+    container_name: dev
+    working_dir: /app
+    depends_on:
+      - mongoDb
+    environment:
+      MONGO_URI: mongodb://user:pass@mongoDb:27017
+      DB_NAME: portfolio
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src:/app/src
+      - ./package.json:/app/package.json
+      - ./pnpm-lock.yaml:/app/pnpm-lock.yaml
+      - ./tsconfig.json:/app/tsconfig.json
+    command: sh -c "npm install && npm run dev"
