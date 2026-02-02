@@ -12,6 +12,7 @@ class MongoService {
 
     private async getDb(): Promise<Db> {
         try {
+            //Dont worry about multiple connections, MongoClient handles that internally
             await this.client.connect();
             return this.client.db(this.dbName);
         } catch (error) {
