@@ -4,16 +4,11 @@ This repo is being developed in chunks of spare time. All the code is manually w
 
 # Technologies in use
 
- - Typescript
- - Node
- - Express
- - Cors
- - Joi
- - swagger-jsdoc
- - swagger-ui-express
- - Faker-js
- - MongoDb
- - Docker
+ - Stack: Typescript, Node, Express, Cors, Joi.
+ - Documentation: swagger-jsdoc, swagger-ui-express.
+ - Database: MongoDb - Faker-js.
+ - Testing: Jest, Supertest.
+ - Virtualization: Docker.
 
 # How to Run it: docker-compose.yml
 1. Make sure Docker Desktop is installed.

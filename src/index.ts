@@ -50,6 +50,10 @@ app.use('/api', router);
 app.use(errorHandler);
 
 // Start server
-app.listen(port, (): void => {
-  console.log(`Server is running at http://localhost:${port}`);
-});
+if (require.main === module) {
+  app.listen(port, (): void => {
+    console.log(`Server is running at http://localhost:${port} docs at http://localhost:${port}/api-docs`);
+  });
+}
+
+export default app;
