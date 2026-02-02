@@ -1,4 +1,4 @@
-import type { Document, OptionalUnlessRequiredId, UpdateResult, WithId } from "mongodb";
+import type { Document, InsertOneResult, ObjectId, OptionalUnlessRequiredId, UpdateResult, WithId } from "mongodb";
 import { MongoClient, Db, Collection } from "mongodb";
 
 class MongoService {
@@ -26,7 +26,7 @@ class MongoService {
         return db.collection<T>(name);
     }
 
-    async insertOne<T extends Document>(collectionName: string, doc: OptionalUnlessRequiredId<T>): Promise<Document> {
+    async insertOne<T extends Document>(collectionName: string, doc: OptionalUnlessRequiredId<T>): Promise<ObjectId> {
         const col = await this.getCollection<T>(collectionName);
         const result = await col.insertOne(doc);
         if (!result.acknowledged) {

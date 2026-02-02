@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express';
+import type { Product } from '../../models/v1/product.models';
 import { createProductSchema, updateProductSchema, mongoDbIdSchema } from '../../models/v1/product.models';
 import express from 'express';
 import schemaValidator from '../../middlewares/schemaValidator.middleware';
@@ -46,8 +47,8 @@ router.get('/',
 router.post('/',
   schemaValidator(createProductSchema, 'body'),
   async (req: Request, res: Response) => {
-    const createdId = await productServicesV1.createProduct(req.body);
-    return res.status(201).json(createdId);
+    const product: Product = await productServicesV1.createProduct(req.body);
+    return res.status(201).json(product);
   }
 );
 
@@ -120,11 +121,11 @@ router.put('/:_id',
     if (typeof req.params._id !== 'string') {
       return res.status(400).json({ error: 'Invalid _id parameter' });
     }
-    const document = await productServicesV1.replaceProduct(req.params._id, req.body);
-    if (!document) {
+    const product = await productServicesV1.replaceProduct(req.params._id, req.body);
+    if (!product) {
       return res.status(404).json({ error: 'Product not found' });
     }
-    return res.status(200).json(document);
+    return res.status(200).json(product);
   }
 );
 
@@ -162,11 +163,11 @@ router.patch('/:_id',
     if (typeof req.params._id !== 'string') {
       return res.status(400).json({ error: 'Invalid _id parameter' });
     }
-    const document = await productServicesV1.updateProduct(req.params._id, req.body);
-    if (!document) {
+    const product = await productServicesV1.updateProduct(req.params._id, req.body);
+    if (!product) {
       return res.status(404).json({ error: 'Product not found' });
     }
-    return res.status(200).json(document);
+    return res.status(200).json(product);
   }
 );
 

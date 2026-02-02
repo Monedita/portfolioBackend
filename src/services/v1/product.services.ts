@@ -21,8 +21,8 @@ class ProductServicesV1 {
             createAt: new Date(),
             ...productData
         };
-        const createdId: Product = await mongoService.insertOne<Product>('products', newProduct) as Product;
-        return createdId;
+        const createdId: ObjectId = await mongoService.insertOne<Product>('products', newProduct);
+        return { _id: createdId, ...newProduct };
     }
 
     public async replaceProduct(_id: string, productData: Omit<Product, 'createAt'>): Promise<Product | null> {
