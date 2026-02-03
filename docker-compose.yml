@@ -1,26 +1,30 @@
 services:
-  mongoDb:
-    image: mongodb/mongodb-community-server:latest
+  mongodb:
+    image: mongodb/mongodb-community-server:7.0-ubi8
     container_name: mongodb
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: user
-      MONGO_INITDB_ROOT_PASSWORD: pass
-      MONGO_INITDB_DATABASE: portfolio
+      MONGODB_INITDB_ROOT_USERNAME: user
+      MONGODB_INITDB_ROOT_PASSWORD: pass
+      MONGODB_INITDB_DATABASE: portfolio
     volumes:
-      - type: bind
-        source: ./data
-        target: /data/db
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   seed:
     image: node:20-slim
     container_name: seed
     working_dir: /app
     depends_on:
-      - mongoDb
+      mongodb:
+        condition: service_healthy
     environment:
-      MONGO_URI: mongodb://user:pass@mongoDb:27017
+      MONGO_URI: mongodb://user:pass@mongodb:27017
       DB_NAME: portfolio
     volumes:
       - ./src:/app/src
@@ -35,9 +39,10 @@ services:
     container_name: dev
     working_dir: /app
     depends_on:
-      - mongoDb
+      seed:
+        condition: service_completed_successfully
     environment:
-      MONGO_URI: mongodb://user:pass@mongoDb:27017
+      MONGO_URI: mongodb://user:pass@mongodb:27017
       DB_NAME: portfolio
       PORT: 3000
     ports:
@@ -48,3 +53,6 @@ services:
       - ./pnpm-lock.yaml:/app/pnpm-lock.yaml
       - ./tsconfig.json:/app/tsconfig.json
     command: sh -c "npm install -g pnpm && pnpm install && pnpm run dev"
+
+volumes:
+  mongo-data:
