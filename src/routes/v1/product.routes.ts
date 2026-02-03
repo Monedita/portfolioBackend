@@ -9,19 +9,55 @@ const router = express.Router();
 
 
 /**
+/**
  * @openapi
  * /api/v1/products:
  *   get:
- *     summary: Get all products
+ *     summary: Get all products (with search & pagination)
  *     tags:
  *       - Products
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Text to search in product name and description
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         required: false
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 20
+ *           default: 10
+ *         required: false
+ *         description: Number of products per page
  *     responses:
  *       200:
  *         description: List of products
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Product'
  */
 router.get('/',
   async (req: Request, res: Response) => {
-    const products = await productServicesV1.getAllProducts();
+    const search: string | undefined = req.query.search as string | undefined;
+    let page: number = parseInt(req.query.page as string, 10);
+    page = isNaN(page) ? 1 : page < 1 ? 1 : page;
+    let limit: number = parseInt(req.query.limit as string, 10);
+    limit = isNaN(limit) ? 10 : limit < 1 ? 1 : limit > 20 ? 20 : limit;
+    const products = await productServicesV1.getAllProducts(search, page, limit);
     return res.json(products);
   }
 );

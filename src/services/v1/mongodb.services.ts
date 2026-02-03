@@ -36,9 +36,9 @@ class MongoService {
         }
     }
 
-    async find<T extends Document>(collectionName: string, query = {}) {
+    async find<T extends Document>(collectionName: string, query = {}, options = {}) {
         const col = await this.getCollection<T>(collectionName);
-        return col.find(query).toArray();
+        return col.find(query, options).toArray();
     }
 
     async findOne<T extends Document>(collectionName: string, query = {}): Promise<WithId<T> | null> {

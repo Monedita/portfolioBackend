@@ -7,8 +7,12 @@ import { mongoService } from "./mongodb.services";
 
 class ProductServicesV1 {
 
-    public async getAllProducts(): Promise<Product[]> {
-        return await mongoService.find<Product>('products');
+    public async getAllProducts(search: string | undefined, page: number, limit: number): Promise<Product[]> {
+        return await mongoService.find<Product>(
+            'products',
+            search ? { $text: { $search: search } } : {},
+            { skip: (page - 1) * limit, limit }
+        );
     }
 
     public async getOneProduct(_id: string): Promise<WithId<Product> | null> {
