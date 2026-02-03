@@ -26,8 +26,13 @@ services:
     environment:
       MONGO_URI: mongodb://user:pass@mongodb:27017
       DB_NAME: portfolio
+      PRODUCT_COLLECTION: "products"
+      TARGET_PRODUCT_COUNT: 100
+      BACKEND_USER: "dbUser"
+      BACKEND_PASSWORD: "Secure1234!"
     volumes:
-      - ./src:/app/src
+      - ./src/models/v1/product.models.ts:/app/src/models/v1/product.models.ts
+      - ./src/scripts/seed.ts:/app/src/scripts/seed.ts
       - ./package.json:/app/package.json
       - ./pnpm-lock.yaml:/app/pnpm-lock.yaml
       - ./tsconfig.json:/app/tsconfig.json
@@ -42,7 +47,7 @@ services:
       seed:
         condition: service_completed_successfully
     environment:
-      MONGO_URI: mongodb://user:pass@mongodb:27017
+      MONGO_URI: mongodb://dbUser:Secure1234!@mongodb:27017
       DB_NAME: portfolio
       PORT: 3000
     ports:

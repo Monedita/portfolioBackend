@@ -61,11 +61,6 @@ class MongoService {
         const result = await col.deleteOne(query);
         return result;
     }
-
-    async countDocuments<T extends Document>(collectionName: string, query = {}) {
-        const col = await this.getCollection<T>(collectionName);
-        return col.countDocuments(query);
-    }
 }
 
 const uri = process.env.MONGO_URI || "mongodb://user:pass@localhost:27017";
