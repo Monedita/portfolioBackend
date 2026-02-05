@@ -1,4 +1,6 @@
+import bcrypt from 'bcrypt';
 import type { Product } from "../models/v1/product.models";
+import type { User } from "../models/v1/user.models";
 import { faker } from '@faker-js/faker';
 import { MongoClient, Db, Collection, IndexDescriptionInfo } from "mongodb";
 
@@ -10,6 +12,7 @@ async function seed() {
     const DB_NAME: string = process.env.DB_NAME || "portfolio";
     const TARGET_PRODUCT_COUNT: number = parseInt(process.env.TARGET_PRODUCT_COUNT || "100", 10);
     const PRODUCT_COLLECTION: string = process.env.PRODUCT_COLLECTION || "products";
+    const USER_COLLECTION = process.env.USER_COLLECTION || "users";
     const BACKEND_USER: string = process.env.BACKEND_USER || "dbUser";
     const BACKEND_PASSWORD: string = process.env.BACKEND_PASSWORD || "Secure1234!";
     
@@ -18,6 +21,7 @@ async function seed() {
     await client.connect();
     const db: Db = client.db(DB_NAME);
     const col: Collection<Product> = db.collection(PRODUCT_COLLECTION);
+    const userCol: Collection<User> = db.collection(USER_COLLECTION);
 
     // Create text index in products
     let indexes: IndexDescriptionInfo[] = [];
@@ -37,6 +41,20 @@ async function seed() {
         console.log("Index 'product_search_index' CREATED!.");
     } else {
         console.log("Index 'product_search_index' already exists.");
+    }
+
+    // Create admin user if not exists
+    const admin: User = {
+        email: "admin@example.com",
+        password: await bcrypt.hash("adminpassword", 10),
+        fullName: "Admin User",
+        admin: true,
+        createAt: new Date()
+    };
+    const existingAdmin = await userCol.findOne({ email: admin.email });
+    if (!existingAdmin) {
+        await userCol.insertOne(admin);
+        console.log("Admin user created with email: " + admin.email + " and password: adminpassword");
     }
 
     // Populate with products
@@ -66,7 +84,6 @@ async function seed() {
     // Create mongoDb user if not exists
     const adminDb: Db = client.db("admin");
     const users = await adminDb.command({ usersInfo: BACKEND_USER });
-    console.log("Existing users:", users);
     let dbUserExists = users.users?.some((u: { user: string }) => u.user === BACKEND_USER);
     if (!dbUserExists) {
         try {

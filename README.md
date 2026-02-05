@@ -5,6 +5,7 @@ This repo is being developed in chunks of spare time. All the code is manually w
 # Technologies in use
 
  - Stack: Typescript, Node, Express, Cors, Joi.
+ - Auth: Bcrypt, jsonwebtoken.
  - Documentation: swagger-jsdoc, swagger-ui-express.
  - Database: MongoDb - Faker-js.
  - Testing: Jest, Supertest.
