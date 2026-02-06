@@ -17,10 +17,24 @@ const swaggerOptions = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "API Documentation",
+      title: "Demo Backend API",
       version: "1.0.0",
-      description: "Documentación generada automáticamente con Swagger",
+      description: "Demo admin user admin@example.com - adminpassword",
     },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
   apis: ["./src/routes/**/*.ts", "./src/models/**/*.ts"], // Ajusta las rutas según tu estructura
 };

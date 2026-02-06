@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import type { Product } from '../../models/v1/product.models';
 import { createProductSchema, updateProductSchema, mongoDbIdSchema } from '../../models/v1/product.models';
 import express from 'express';
+import authValidator from '../../middlewares/auth.middleware';
 import schemaValidator from '../../middlewares/schemaValidator.middleware';
 import productServicesV1 from '../../services/v1/product.services';
 
@@ -51,6 +52,7 @@ const router = express.Router();
  *                 $ref: '#/components/schemas/Product'
  */
 router.get('/',
+  authValidator(false),
   async (req: Request, res: Response) => {
     const search: string | undefined = req.query.search as string | undefined;
     let page: number = parseInt(req.query.page as string, 10);
@@ -81,6 +83,7 @@ router.get('/',
  *         description: Product created
  */
 router.post('/',
+  authValidator(true),
   schemaValidator(createProductSchema, 'body'),
   async (req: Request, res: Response) => {
     const product: Product = await productServicesV1.createProduct(req.body);
@@ -110,6 +113,7 @@ router.post('/',
  *         description: Product not found
  */
 router.get('/:_id',
+  authValidator(false),
   schemaValidator(mongoDbIdSchema, 'params'),
   async (req: Request, res: Response) => {
     if (typeof req.params._id !== 'string') {
@@ -151,6 +155,7 @@ router.get('/:_id',
  *         description: Product not found
  */
 router.put('/:_id',
+  authValidator(true),
   schemaValidator(mongoDbIdSchema, 'params'),
   schemaValidator(createProductSchema, 'body'),
   async (req: Request, res: Response) => {
@@ -193,6 +198,7 @@ router.put('/:_id',
  *         description: Product not found
  */
 router.patch('/:_id',
+  authValidator(true),
   schemaValidator(mongoDbIdSchema, 'params'),
   schemaValidator(updateProductSchema, 'body'),
   async (req: Request, res: Response) => {
@@ -228,17 +234,20 @@ router.patch('/:_id',
  *       404:
  *         description: Product not found
  */
-router.delete('/:_id', schemaValidator(mongoDbIdSchema, 'params'), async (req: Request, res: Response) => {
-  if (typeof req.params._id !== 'string') {
-    return res.status(400).json({ error: 'Invalid _id parameter' });
+router.delete('/:_id',
+  authValidator(true),
+  schemaValidator(mongoDbIdSchema, 'params'), async (req: Request, res: Response) => {
+    if (typeof req.params._id !== 'string') {
+      return res.status(400).json({ error: 'Invalid _id parameter' });
+    }
+    const result = await productServicesV1.deleteProduct(req.params._id);
+    if (!result.acknowledged) {
+      return res.status(500).json({ error: 'Failed to delete product' });
+    } else if (result.deletedCount === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    return res.status(204).json({ message: 'Product deleted successfully' });
   }
-  const result = await productServicesV1.deleteProduct(req.params._id);
-  if (!result.acknowledged) {
-    return res.status(500).json({ error: 'Failed to delete product' });
-  } else if (result.deletedCount === 0) {
-    return res.status(404).json({ error: 'Product not found' });
-  }
-  return res.status(204).json({ message: 'Product deleted successfully' });
-});
+);
 
 export default router;
