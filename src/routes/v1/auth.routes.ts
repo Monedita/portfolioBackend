@@ -74,7 +74,15 @@ router.post('/login',
 router.post('/register',
   schemaValidator(createUserSchema, 'body'),
   async (req: Request, res: Response) => {
-    const user: User = await authServicesV1.createUser(req.body);
+    let user: User;
+    try {
+      user = await authServicesV1.createUser(req.body);
+    } catch (error: any) {
+      if (error.message === 'Email already exists') {
+        return res.status(400).json({ message: error.message });
+      }
+      throw error;
+    }
     const { password, ...publicUser } = user;
     return res.status(201).json(publicUser);
   }

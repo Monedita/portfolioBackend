@@ -23,6 +23,10 @@ class AuthServicesV1 {
             createAt: new Date(),
             admin: false,
         };
+        const existingUser = await mongoService.findOne<User>(USER_COLLECTION, { email: userData.email });
+        if (existingUser) {
+            throw new Error('Email already exists');
+        }
         const createdId: ObjectId = await mongoService.insertOne<User>(USER_COLLECTION, newUser);
         return { _id: createdId, ...newUser };
     }
